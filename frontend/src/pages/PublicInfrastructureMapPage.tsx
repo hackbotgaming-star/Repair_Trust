@@ -182,7 +182,7 @@ export const PublicInfrastructureMapPage: React.FC = () => {
       });
 
       marker.addListener('click', () => {
-        setSelectedComplaint(c);
+        navigate(`/track/${c.complaintId}`);
       });
 
       markersRef.current.push(marker);
@@ -326,7 +326,7 @@ export const PublicInfrastructureMapPage: React.FC = () => {
         )}
 
         {/* Interactive Pinpoints on Map */}
-        <div className="absolute inset-0 pointer-events-none z-15 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
           {filteredComplaints.map((c) => {
             const lat = c.location?.coordinates?.lat || c.publicLocation?.coordinates?.lat || 12.9716;
             const lng = c.location?.coordinates?.lng || c.publicLocation?.coordinates?.lng || 77.5946;
@@ -348,13 +348,12 @@ export const PublicInfrastructureMapPage: React.FC = () => {
               : 'from-amber-500 to-yellow-600 ring-amber-300';
 
             return (
-              <div
+              <Link
                 key={c.complaintId}
+                to={`/track/${c.complaintId}`}
                 style={{ top: pos.top, left: pos.left }}
-                className="absolute -translate-x-1/2 -translate-y-full pointer-events-auto group cursor-pointer"
-                onClick={() => setSelectedComplaint(c)}
-                onDoubleClick={() => navigate(`/track/${c.complaintId}`)}
-                title={`Touch or click to view ${c.complaintId}`}
+                className="absolute -translate-x-1/2 -translate-y-full pointer-events-auto group cursor-pointer z-20 hover:z-30 block text-decoration-none"
+                title={`Touch to open ${c.complaintId}`}
               >
                 {/* Pulsing ground radar beacon */}
                 <div
@@ -365,7 +364,7 @@ export const PublicInfrastructureMapPage: React.FC = () => {
 
                 {/* 3D Pin Head */}
                 <div
-                  className={`relative flex items-center justify-center transition-all duration-300 transform group-hover:scale-125 ${
+                  className={`relative flex items-center justify-center transition-all duration-300 transform group-hover:scale-125 group-active:scale-110 ${
                     isSelected ? 'scale-125 z-30' : 'hover:z-20'
                   }`}
                 >
@@ -398,26 +397,18 @@ export const PublicInfrastructureMapPage: React.FC = () => {
 
                 {/* Pin Tooltip with Direct Touch-to-Open Action */}
                 <div
-                  className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-slate-900/95 text-white text-[11px] font-mono px-3 py-1.5 rounded-xl shadow-xl pointer-events-auto transition-all duration-200 border border-slate-700/80 ${
-                    isSelected
-                      ? 'opacity-100 scale-105 z-30'
-                      : 'opacity-0 group-hover:opacity-100 group-hover:scale-100 z-10'
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/track/${c.complaintId}`);
-                  }}
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-slate-900/95 text-white text-[11px] font-mono px-3 py-1.5 rounded-xl shadow-xl transition-all duration-200 border border-slate-700/80 opacity-0 group-hover:opacity-100 group-hover:scale-100 z-30 pointer-events-none"
                 >
                   <div className="font-bold flex items-center gap-1.5">
                     <span className="text-teal-400 font-mono">{c.complaintId}</span>
                     <span className="text-slate-300 text-[10px] font-sans">({c.category})</span>
                   </div>
-                  <div className="text-[10px] text-teal-300 font-sans mt-0.5 flex items-center gap-1 font-semibold hover:underline">
+                  <div className="text-[10px] text-teal-300 font-sans mt-0.5 flex items-center gap-1 font-semibold">
                     <span>Touch to open complaint page</span>
                     <ArrowRight className="w-3 h-3 text-teal-300 inline" />
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

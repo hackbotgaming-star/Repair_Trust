@@ -219,7 +219,7 @@ export const EngineerMapViewPage: React.FC = () => {
                 <h4 style="margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #0f172a;">${c.category}</h4>
                 <p style="margin: 0 0 6px 0; font-size: 11px; color: #64748b;">"${c.description || 'Reported citizen issue'}"</p>
                 <div style="margin-top: 8px;">
-                  <a href="/complaints" style="display: block; text-align: center; background: #ea580c; color: white; padding: 5px; border-radius: 6px; text-decoration: none; font-size: 11px; font-weight: bold;">
+                  <a href="/track/${c.complaintId}" style="display: block; text-align: center; background: #ea580c; color: white; padding: 5px; border-radius: 6px; text-decoration: none; font-size: 11px; font-weight: bold;">
                     Review in Complaints Hub &rarr;
                   </a>
                 </div>
