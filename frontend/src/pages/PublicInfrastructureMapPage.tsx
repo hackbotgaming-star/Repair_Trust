@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { loadGoogleMaps, isGoogleMapsApiKeyConfigured } from '../utils/googleMapsLoader';
 import {
   MapPin,
+  Wrench,
   Filter,
   AlertTriangle,
   ExternalLink,
@@ -16,6 +17,7 @@ import {
 import { api } from '../api/client';
 
 export const PublicInfrastructureMapPage: React.FC = () => {
+  const navigate = useNavigate();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
@@ -163,7 +165,23 @@ export const PublicInfrastructureMapPage: React.FC = () => {
     });
   }, [filteredComplaints, hasApiKey]);
 
-  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=${targetLat},${targetLng}&t=m&z=${selectedComplaint ? 16 : 13}&ie=UTF8&iwloc=&output=embed`;
+  // Calculate spatial pin position on the map
+  const getPinPosition = (lat: number, lng: number) => {
+    const minLat = 12.935;
+    const maxLat = 12.985;
+    const minLng = 77.560;
+    const maxLng = 77.645;
+
+    const clampedLat = Math.max(minLat, Math.min(maxLat, lat));
+    const clampedLng = Math.max(minLng, Math.min(maxLng, lng));
+
+    const topPercent = ((maxLat - clampedLat) / (maxLat - minLat)) * 68 + 16;
+    const leftPercent = ((clampedLng - minLng) / (maxLng - minLng)) * 74 + 13;
+
+    return { top: `${topPercent}%`, left: `${leftPercent}%` };
+  };
+
+    const googleMapsEmbedUrl = `https://maps.google.com/maps?q=${targetLat},${targetLng}&t=m&z=${selectedComplaint ? 16 : 13}&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50">
@@ -278,6 +296,103 @@ export const PublicInfrastructureMapPage: React.FC = () => {
             allowFullScreen
           />
         )}
+
+        {/* Interactive Pinpoints on Map */}
+        <div className="absolute inset-0 pointer-events-none z-15 overflow-hidden">
+          {filteredComplaints.map((c) => {
+            const lat = c.location?.coordinates?.lat || c.publicLocation?.coordinates?.lat || 12.9716;
+            const lng = c.location?.coordinates?.lng || c.publicLocation?.coordinates?.lng || 77.5946;
+            const pos = getPinPosition(lat, lng);
+            const isSelected = selectedComplaint?.complaintId === c.complaintId;
+            const isRepeat =
+              c.status === 'REOPENED' ||
+              c.status === 'DISPUTED' ||
+              c.description?.toLowerCase().includes('repeat');
+            const isResolved = c.status === 'VERIFIED_RESOLVED' || c.status === 'Resolved' || c.status === 'Closed';
+            const isInProgress = c.status === 'In Progress' || c.status === 'WORK_IN_PROGRESS';
+
+            const pinGradient = isRepeat
+              ? 'from-rose-500 to-red-600 ring-rose-300'
+              : isResolved
+              ? 'from-emerald-500 to-teal-600 ring-emerald-300'
+              : isInProgress
+              ? 'from-blue-500 to-sky-600 ring-blue-300'
+              : 'from-amber-500 to-yellow-600 ring-amber-300';
+
+            return (
+              <div
+                key={c.complaintId}
+                style={{ top: pos.top, left: pos.left }}
+                className="absolute -translate-x-1/2 -translate-y-full pointer-events-auto group cursor-pointer"
+                onClick={() => setSelectedComplaint(c)}
+                onDoubleClick={() => navigate(`/track/${c.complaintId}`)}
+                title={`Touch or click to view ${c.complaintId}`}
+              >
+                {/* Pulsing ground radar beacon */}
+                <div
+                  className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-3 rounded-full animate-ping pointer-events-none ${
+                    isRepeat ? 'bg-rose-500/40' : 'bg-teal-500/40'
+                  }`}
+                />
+
+                {/* 3D Pin Head */}
+                <div
+                  className={`relative flex items-center justify-center transition-all duration-300 transform group-hover:scale-125 ${
+                    isSelected ? 'scale-125 z-30' : 'hover:z-20'
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full bg-gradient-to-br ${pinGradient} text-white flex items-center justify-center shadow-lg border-2 border-white ring-2`}
+                  >
+                    {isRepeat ? (
+                      <AlertTriangle className="w-4 h-4 text-white" />
+                    ) : isResolved ? (
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    ) : isInProgress ? (
+                      <Wrench className="w-4 h-4 text-white" />
+                    ) : (
+                      <MapPin className="w-4 h-4 text-white" />
+                    )}
+                  </div>
+                  {/* Pin tail */}
+                  <div
+                    className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] ${
+                      isRepeat
+                        ? 'border-t-rose-600'
+                        : isResolved
+                        ? 'border-t-emerald-600'
+                        : isInProgress
+                        ? 'border-t-blue-600'
+                        : 'border-t-amber-600'
+                    }`}
+                  />
+                </div>
+
+                {/* Pin Tooltip with Direct Touch-to-Open Action */}
+                <div
+                  className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-slate-900/95 text-white text-[11px] font-mono px-3 py-1.5 rounded-xl shadow-xl pointer-events-auto transition-all duration-200 border border-slate-700/80 ${
+                    isSelected
+                      ? 'opacity-100 scale-105 z-30'
+                      : 'opacity-0 group-hover:opacity-100 group-hover:scale-100 z-10'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/track/${c.complaintId}`);
+                  }}
+                >
+                  <div className="font-bold flex items-center gap-1.5">
+                    <span className="text-teal-400 font-mono">{c.complaintId}</span>
+                    <span className="text-slate-300 text-[10px] font-sans">({c.category})</span>
+                  </div>
+                  <div className="text-[10px] text-teal-300 font-sans mt-0.5 flex items-center gap-1 font-semibold hover:underline">
+                    <span>Touch to open complaint page</span>
+                    <ArrowRight className="w-3 h-3 text-teal-300 inline" />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
         {/* Floating Complaint Pins for Instant Selection */}
         <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 max-w-[85%] sm:max-w-xl pointer-events-auto">

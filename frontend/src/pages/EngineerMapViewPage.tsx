@@ -398,42 +398,62 @@ export const EngineerMapViewPage: React.FC = () => {
         <div className="h-[680px] w-full relative">
           <div ref={mapContainerRef} className="w-full h-full" />
 
-          {/* Fallback Display if API key is not yet set */}
+          {/* Live Google Maps Embed & Interactive Pins when API key is not direct */}
           {!isLoaded && (
-            <div className="absolute inset-0 bg-slate-100 flex flex-col justify-between p-6 z-10">
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 p-4 shadow-sm max-w-lg space-y-2">
-                <div className="flex items-center gap-2 text-teal-800 font-bold text-xs">
-                  <Globe className="w-4 h-4 text-teal-600" />
-                  <span>Google Maps Platform Active</span>
-                </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Google Maps JavaScript API v3 initialized. Set <code className="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-teal-700 font-bold">VITE_GOOGLE_MAPS_API_KEY</code> in <code className="bg-slate-100 px-1.5 py-0.5 rounded font-mono">frontend/.env</code> for live tile streaming.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto max-h-96 p-2">
-                {filteredAssets.map((asset) => (
-                  <div
-                    key={asset.assetId}
-                    className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-1"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold text-teal-900 bg-teal-50 px-2 py-0.5 rounded">
-                        {asset.assetId}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">{asset.type}</span>
-                    </div>
-                    <div className="text-xs font-bold text-slate-800 truncate">{asset.name}</div>
-                    <div className="text-[11px] text-slate-500">{asset.location.street}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-right text-[11px] text-slate-400 font-mono">
-                Google Maps Cadastral Grid &bull; Coordinates: 12.9716 N, 77.5946 E
-              </div>
-            </div>
+            <iframe
+              title="Google Maps Municipal Engineer View"
+              src="https://maps.google.com/maps?q=12.9716,77.5946&t=m&z=13&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-full border-0 absolute inset-0"
+              loading="lazy"
+              allowFullScreen
+            />
           )}
+
+          {/* Interactive Spatial Pinpoint Layer Over Map */}
+          <div className="absolute inset-0 pointer-events-none z-15 overflow-hidden">
+            {complaints.slice(0, 15).map((c) => {
+              const lat = c.location?.coordinates?.lat || 12.9716;
+              const lng = c.location?.coordinates?.lng || 77.5946;
+              const minLat = 12.935;
+              const maxLat = 12.985;
+              const minLng = 77.560;
+              const maxLng = 77.645;
+              const clampedLat = Math.max(minLat, Math.min(maxLat, lat));
+              const clampedLng = Math.max(minLng, Math.min(maxLng, lng));
+              const top = `${((maxLat - clampedLat) / (maxLat - minLat)) * 68 + 16}%`;
+              const left = `${((clampedLng - minLng) / (maxLng - minLng)) * 74 + 13}%`;
+
+              return (
+                <div
+                  key={c.complaintId}
+                  style={{ top, left }}
+                  className="absolute -translate-x-1/2 -translate-y-full pointer-events-auto group cursor-pointer"
+                  title={`Click to view ${c.complaintId}`}
+                >
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-3 rounded-full bg-rose-500/40 animate-ping pointer-events-none" />
+                  <div className="relative flex items-center justify-center transition-all duration-300 transform group-hover:scale-125">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-rose-500 to-red-600 text-white flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-rose-300">
+                      <AlertTriangle className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[5px] border-t-rose-600" />
+                  </div>
+
+                  <Link
+                    to={`/track/${c.complaintId}`}
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-slate-900/95 text-white text-[11px] font-mono px-3 py-1.5 rounded-xl shadow-xl pointer-events-auto opacity-0 group-hover:opacity-100 transition-all duration-200 border border-slate-700/80 z-20 block hover:bg-slate-800"
+                  >
+                    <div className="font-bold flex items-center gap-1.5 text-teal-400">
+                      <span>{c.complaintId}</span>
+                      <span className="text-slate-300 font-sans text-[10px]">({c.category})</span>
+                    </div>
+                    <div className="text-[10px] text-teal-300 font-sans mt-0.5 font-semibold">
+                      Touch to open complaint page &rarr;
+                    </div>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
