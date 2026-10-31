@@ -374,7 +374,11 @@ export const WorkOrderDetailPage: React.FC = () => {
                   <div className="space-y-2">
                     {order.beforeEvidence.map((ev, i) => (
                       <div key={i} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                        <img src={ev.url} alt="Before evidence" className="w-full h-32 object-cover" />
+                        {ev.type === 'video' || (ev.url && (ev.url.endsWith('.webm') || ev.url.endsWith('.mp4'))) ? (
+                          <video src={ev.url} controls className="w-full h-32 object-contain bg-slate-950" />
+                        ) : (
+                          <img src={ev.url} alt="Before evidence" className="w-full h-32 object-cover" />
+                        )}
                         <div className="p-2 text-[11px] text-slate-600">{ev.caption}</div>
                       </div>
                     ))}
@@ -395,7 +399,11 @@ export const WorkOrderDetailPage: React.FC = () => {
                   <div className="space-y-2">
                     {order.afterEvidence.map((ev, i) => (
                       <div key={i} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                        <img src={ev.url} alt="After evidence" className="w-full h-32 object-cover" />
+                        {ev.type === 'video' || (ev.url && (ev.url.endsWith('.webm') || ev.url.endsWith('.mp4'))) ? (
+                          <video src={ev.url} controls className="w-full h-32 object-contain bg-slate-950" />
+                        ) : (
+                          <img src={ev.url} alt="After evidence" className="w-full h-32 object-cover" />
+                        )}
                         <div className="p-2 text-[11px] text-slate-600">{ev.caption}</div>
                       </div>
                     ))}

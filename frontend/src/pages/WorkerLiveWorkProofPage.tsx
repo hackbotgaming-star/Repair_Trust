@@ -23,6 +23,7 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
   const [videos, setVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewScope, setViewScope] = useState<'ACTIVE_TASK' | 'ALL_VIDEOS'>('ACTIVE_TASK');
+  const [stageFilter, setStageFilter] = useState<string>('ALL');
 
   const initialTaskId = searchParams.get('task') || 'WO-2026-003';
 
@@ -34,7 +35,7 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
       const tasksRes = await api.workOrders.myTasks();
       let taskList = tasksRes.data || [];
 
-      // 2. Fall back to all active work orders so any role (engineer, admin, worker) can operate the station
+      // 2. Fall back to all active work orders so any role can operate the station
       if (taskList.length === 0) {
         const allRes = await api.workOrders.list({ limit: 50 });
         taskList = allRes.data || [];
@@ -71,7 +72,16 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
     (v) => selectedTask && v.workOrderId === selectedTask.workOrderId
   );
 
-  const displayedVideos = viewScope === 'ALL_VIDEOS' ? videos : relevantVideos;
+  const scopeVideos = viewScope === 'ALL_VIDEOS' ? videos : relevantVideos;
+
+  const finalDisplayedVideos = scopeVideos.filter((v) => {
+    if (stageFilter === 'ALL') return true;
+    return v.stage === stageFilter;
+  });
+
+  const beforeCount = scopeVideos.filter((v) => v.stage === 'before_cleaning').length;
+  const duringCount = scopeVideos.filter((v) => v.stage === 'during_operation').length;
+  const afterCount = scopeVideos.filter((v) => v.stage === 'post_completion_flow').length;
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
@@ -163,7 +173,7 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
       {/* Submitted Proof Footage Section */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               <Film className="w-4 h-4 text-rose-600" />
               {viewScope === 'ACTIVE_TASK'
@@ -207,17 +217,69 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
           </button>
         </div>
 
-        {displayedVideos.length === 0 ? (
+        {/* Stage Filter Pills */}
+        <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+          <span className="text-slate-400 font-bold uppercase text-[10px]">Filter Stage:</span>
+          <button
+            type="button"
+            onClick={() => setStageFilter('ALL')}
+            className={`px-3 py-1 rounded-lg font-bold transition border ${
+              stageFilter === 'ALL'
+                ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+            }`}
+          >
+            All Footage ({scopeVideos.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStageFilter('before_cleaning')}
+            className={`px-3 py-1 rounded-lg font-bold transition border ${
+              stageFilter === 'before_cleaning'
+                ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
+                : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+            }`}
+          >
+            Before Cleaning ({beforeCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStageFilter('during_operation')}
+            className={`px-3 py-1 rounded-lg font-bold transition border ${
+              stageFilter === 'during_operation'
+                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                : 'bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100'
+            }`}
+          >
+            During Operation ({duringCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStageFilter('post_completion_flow')}
+            className={`px-3 py-1 rounded-lg font-bold transition border ${
+              stageFilter === 'post_completion_flow'
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+            }`}
+          >
+            After Cleaning (Flow) ({afterCount})
+          </button>
+        </div>
+
+        {finalDisplayedVideos.length === 0 ? (
           <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-2">
             <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />
-            <p className="text-xs font-bold text-slate-700">No Video Proof Submitted Yet for this Task</p>
+            <p className="text-xs font-bold text-slate-700">No {stageFilter !== 'ALL' ? stageFilter.replace('_', ' ') : ''} Video Proof Submitted Yet</p>
             <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-              This task currently flags a Closure Auditor missing video proof warning. Record a live video walkthrough above or upload a footage file.
+              Select '{stageFilter !== 'ALL' ? stageFilter.replace('_', ' ') : 'Before Cleaning'}' in the recorder above and submit footage to satisfy municipal audit standards.
             </p>
             {videos.length > 0 && viewScope === 'ACTIVE_TASK' && (
               <button
                 type="button"
-                onClick={() => setViewScope('ALL_VIDEOS')}
+                onClick={() => {
+                  setViewScope('ALL_VIDEOS');
+                  setStageFilter('ALL');
+                }}
                 className="mt-2 text-xs font-bold text-teal-600 hover:underline inline-flex items-center gap-1"
               >
                 View {videos.length} other verified videos in the registry &rarr;
@@ -226,7 +288,7 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {displayedVideos.map((vid) => (
+            {finalDisplayedVideos.map((vid) => (
               <VideoPlayer key={vid.videoId} video={vid} />
             ))}
           </div>

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const evidenceItemSchema = new mongoose.Schema({
   url: { type: String, required: true },
-  type: { type: String, enum: ['photo', 'document', 'note'], default: 'photo' },
+  type: { type: String, enum: ['photo', 'document', 'note', 'video'], default: 'photo' },
   caption: { type: String, default: '' },
   timestamp: { type: Date, default: Date.now },
   sha256Hash: { type: String },

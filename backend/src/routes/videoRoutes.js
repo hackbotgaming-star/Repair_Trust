@@ -9,6 +9,7 @@ const AuditLog = require('../models/AuditLog');
 const { authenticate, authorizeRoles } = require('../middleware/auth');
 const { upload } = require('../middleware/upload');
 const { auditWorkOrder } = require('../services/auditorService');
+const { generateSequentialId } = require('../utils/idGenerator');
 
 // List Videos
 router.get('/', async (req, res) => {
@@ -104,18 +105,37 @@ router.post('/upload', authenticate, upload.single('video'), async (req, res) =>
 
     await video.save();
 
-    // Link video into WorkOrder
+    // Link video into WorkOrder and categorize into before / during / after evidence collections
     const order = await WorkOrder.findOne({ workOrderId: workOrderId.toUpperCase() });
     if (order) {
       if (!order.videoEvidence.includes(video._id)) {
         order.videoEvidence.push(video._id);
       }
-      
+
+      const evidenceEntry = {
+        url: fileUrl,
+        type: 'video',
+        caption: `LiveWork Proof: ${stage === 'before_cleaning' ? 'Before Cleaning' : stage === 'during_operation' ? 'During Cleaning Operation' : stage === 'post_completion_flow' ? 'After Cleaning Flow' : 'Full Walkthrough'} (${nextVideoId})`,
+        timestamp: new Date(),
+        fileSize: req.file.size,
+        uploadedBy: req.user.name || req.user.email
+      };
+
+      if (stage === 'before_cleaning') {
+        order.beforeEvidence.push(evidenceEntry);
+      } else if (stage === 'during_operation') {
+        order.duringEvidence.push(evidenceEntry);
+      } else if (stage === 'post_completion_flow') {
+        order.afterEvidence.push(evidenceEntry);
+      } else if (stage === 'combined_walkthrough') {
+        order.afterEvidence.push(evidenceEntry);
+      }
+
       order.auditLog.push({
         action: 'LIVEWORK_VIDEO_UPLOADED',
         performedBy: req.user.name || req.user.email,
         role: req.user.role,
-        note: `Uploaded video ${nextVideoId} for stage '${stage}'`,
+        note: `Uploaded video ${nextVideoId} categorized as '${stage}'`,
         previousStatus: order.status,
         newStatus: order.status
       });

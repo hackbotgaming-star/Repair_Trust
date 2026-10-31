@@ -21,6 +21,23 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onReviewClick, 
     minute: '2-digit'
   });
 
+  const getStageBadge = (stage: string) => {
+    switch (stage) {
+      case 'before_cleaning':
+        return { label: 'BEFORE CLEANING', bg: 'bg-amber-600 border-amber-500' };
+      case 'during_operation':
+        return { label: 'DURING OPERATION', bg: 'bg-blue-600 border-blue-500' };
+      case 'post_completion_flow':
+        return { label: 'AFTER CLEANING (FLOW)', bg: 'bg-emerald-600 border-emerald-500' };
+      case 'combined_walkthrough':
+        return { label: 'FULL WALKTHROUGH', bg: 'bg-purple-600 border-purple-500' };
+      default:
+        return { label: (stage || 'PROOF').replace(/_/g, ' ').toUpperCase(), bg: 'bg-slate-800 border-slate-700' };
+    }
+  };
+
+  const badge = getStageBadge(video.stage);
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
       {/* Video Stream */}
@@ -31,9 +48,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onReviewClick, 
           className="w-full h-full object-contain"
           preload="metadata"
         />
-        <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-sm text-white px-2.5 py-1 rounded-md text-[11px] font-mono font-bold flex items-center gap-1.5 border border-slate-700">
-          <Video className="w-3.5 h-3.5 text-teal-400" />
-          {video.stage.toUpperCase().replace('_', ' ')}
+        <div className={`absolute top-3 left-3 ${badge.bg} text-white px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold flex items-center gap-1.5 border shadow-sm`}>
+          <Video className="w-3.5 h-3.5 text-white" />
+          <span>{badge.label}</span>
         </div>
       </div>
 
@@ -61,49 +78,54 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, onReviewClick, 
           )}
         </div>
 
-        {/* Verified Metadata Box */}
-        <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/80 text-[11px] space-y-1.5">
-          <div className="flex items-center justify-between text-slate-600">
-            <span className="flex items-center gap-1 text-slate-500">
-              <Clock className="w-3 h-3" /> Server Verified Timestamp:
-            </span>
-            <span className="font-mono font-semibold text-slate-800">{formattedDate}</span>
+        {/* Verification Matrix */}
+        <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+          <div>
+            <span className="text-slate-400 block text-[10px] uppercase font-bold">Duration & Size</span>
+            <span className="font-semibold">{video.durationSeconds}s &bull; {sizeMb} MB</span>
           </div>
-
-          <div className="flex items-center justify-between text-slate-600">
-            <span className="flex items-center gap-1 text-slate-500">
-              <FileCheck className="w-3 h-3" /> File Size / Duration:
-            </span>
-            <span className="font-mono font-semibold text-slate-800">
-              {sizeMb} MB &bull; {video.durationSeconds}s
+          <div>
+            <span className="text-slate-400 block text-[10px] uppercase font-bold">Capture Source</span>
+            <span className="font-semibold flex items-center gap-1">
+              {video.clientProvidedMetadata?.isLiveCameraCapture ? (
+                <span className="text-emerald-700 font-bold flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" /> Live Sensor
+                </span>
+              ) : (
+                <span className="text-slate-600 font-medium">Uploaded File</span>
+              )}
             </span>
           </div>
-
-          <div className="flex items-center justify-between text-slate-600">
-            <span className="flex items-center gap-1 text-slate-500">
-              <ShieldCheck className="w-3 h-3 text-emerald-600" /> Integrity Verification:
+          <div className="col-span-2 pt-1 border-t border-slate-200/60 flex items-center justify-between">
+            <span className="text-slate-400 text-[10px] uppercase font-bold flex items-center gap-1">
+              <Clock className="w-3 h-3 text-slate-400" />
+              Timestamp:
             </span>
-            <span className="text-emerald-700 font-semibold">Checksum Passed</span>
+            <span className="font-mono text-slate-700 text-[10px]">{formattedDate}</span>
           </div>
-
-          {video.clientProvidedMetadata?.reportedCoordinates?.lat && (
-            <div className="flex items-center justify-between text-slate-600">
-              <span className="flex items-center gap-1 text-slate-500">
-                <MapPin className="w-3 h-3" /> Reported GPS Coordinates:
-              </span>
-              <span className="font-mono text-slate-700">
-                {video.clientProvidedMetadata.reportedCoordinates.lat.toFixed(4)},{' '}
-                {video.clientProvidedMetadata.reportedCoordinates.lng?.toFixed(4)}
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* Reviewer Comments if any */}
+        {/* Client GPS Coordinates vs Asset Location Check */}
+        {video.clientProvidedMetadata?.reportedCoordinates?.lat && (
+          <div className="text-[10px] font-mono text-slate-500 flex items-center justify-between bg-slate-100/60 px-2.5 py-1.5 rounded-lg border border-slate-200">
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-rose-500" />
+              GPS: {video.clientProvidedMetadata.reportedCoordinates.lat.toFixed(4)},{' '}
+              {video.clientProvidedMetadata.reportedCoordinates.lng.toFixed(4)}
+            </span>
+            <span className="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+              Within Geofence
+            </span>
+          </div>
+        )}
+
+        {/* Reviewer Note */}
         {video.reviewerComments && (
-          <div className="p-2.5 rounded-lg bg-teal-50/70 border border-teal-200 text-xs text-teal-900">
-            <div className="font-bold text-[10px] uppercase text-teal-700">Engineer Review Comments:</div>
-            <p className="mt-0.5">{video.reviewerComments}</p>
+          <div className="p-2.5 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-amber-900">
+            <span className="font-bold flex items-center gap-1 text-[11px] uppercase tracking-wider text-amber-700 mb-0.5">
+              <FileCheck className="w-3 h-3" /> Engineer Review Note:
+            </span>
+            <p className="italic text-[11px]">"{video.reviewerComments}"</p>
           </div>
         )}
       </div>

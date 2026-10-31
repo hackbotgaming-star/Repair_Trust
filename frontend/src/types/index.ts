@@ -127,7 +127,7 @@ export interface Complaint {
 
 export interface EvidenceItem {
   url: string;
-  type: 'photo' | 'document' | 'note';
+  type: 'photo' | 'document' | 'note' | 'video';
   caption: string;
   timestamp: string;
 }
