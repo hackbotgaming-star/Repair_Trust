@@ -4,6 +4,7 @@ const Complaint = require('../models/Complaint');
 const Asset = require('../models/Asset');
 const AuditLog = require('../models/AuditLog');
 const { authenticate, authorizeRoles } = require('../middleware/auth');
+const { generateSequentialId } = require('../utils/idGenerator');
 
 // List complaints (Staff view: filters by status, category, ward, assetId)
 router.get('/', async (req, res) => {
@@ -11,7 +12,7 @@ router.get('/', async (req, res) => {
     const { status, category, assetId, ward, search, page = 1, limit = 25 } = req.query;
     const query = {};
 
-    if (status) query.status = status;
+    if (status && status !== 'All' && status !== 'undefined' && status !== 'null') query.status = status;
     if (category) query.category = category;
     if (assetId) query.assetId = assetId.toUpperCase();
     if (ward) query['location.ward'] = ward;
@@ -96,8 +97,7 @@ router.get('/:complaintId', async (req, res) => {
 // Citizen Submit Complaint
 router.post('/', async (req, res) => {
   try {
-    const count = await Complaint.countDocuments();
-    const nextId = `CMP-2026-${String(count + 101).padStart(4, '0')}`;
+    const nextId = await generateSequentialId(Complaint, 'complaintId', 'CMP');
 
     const {
       assetId,

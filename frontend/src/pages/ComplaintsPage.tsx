@@ -262,6 +262,14 @@ export const ComplaintsPage: React.FC = () => {
                   <option value="Foul Odor / Stagnation">Foul Odor / Stagnation</option>
                   <option value="Structural Crack / Collapse">Structural Crack / Collapse</option>
                   <option value="Grate Missing / Damaged">Grate Missing / Damaged</option>
+                  <option value="Pothole / Damaged Road">Pothole / Damaged Road</option>
+                  <option value="Broken Footpath">Broken Footpath</option>
+                  <option value="Manhole Damaged / Open">Manhole Damaged / Open</option>
+                  <option value="Garbage Blockage">Garbage Blockage</option>
+                  <option value="Broken Streetlights">Broken Streetlights</option>
+                  <option value="Water Pipeline Leak">Water Pipeline Leak</option>
+                  <option value="Damaged Culvert / Grate">Damaged Culvert / Grate</option>
+                  <option value="Other Infrastructure Problem">Other Infrastructure Problem</option>
                 </select>
               </div>
 

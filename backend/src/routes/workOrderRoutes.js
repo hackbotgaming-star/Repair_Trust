@@ -8,6 +8,7 @@ const { authenticate, authorizeRoles, optionalAuth } = require('../middleware/au
 const { upload } = require('../middleware/upload');
 const { screenEvidenceFile } = require('../services/evidenceScreeningService');
 const { auditWorkOrder } = require('../services/auditorService');
+const { generateSequentialId } = require('../utils/idGenerator');
 
 // Helper to check worker ownership and authorization
 function hasWorkerPermission(order, user) {
@@ -49,7 +50,7 @@ router.get('/', optionalAuth, async (req, res) => {
       }
     }
 
-    if (status && status !== 'All') query.status = status;
+    if (status && status !== 'All' && status !== 'undefined' && status !== 'null') query.status = status;
     if (assetId) query.assetId = assetId.toUpperCase();
     if (priority && priority !== 'All') query.priority = priority;
     if (auditorStatus) query.closureAuditorStatus = auditorStatus;
@@ -120,8 +121,7 @@ router.get('/:workOrderId', async (req, res) => {
 // Create Work Order (Admin / Engineer)
 router.post('/', authenticate, authorizeRoles('administrator', 'engineer'), async (req, res) => {
   try {
-    const count = await WorkOrder.countDocuments();
-    const nextId = `WO-2026-${String(count + 101).padStart(4, '0')}`;
+    const nextId = await generateSequentialId(WorkOrder, 'workOrderId', 'WO');
 
     const {
       assetId,

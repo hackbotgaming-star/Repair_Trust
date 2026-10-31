@@ -11,6 +11,7 @@ const { recordEvent, verifyEventChain } = require('../../services/eventHistorySe
 const { validateTransition } = require('../../services/stateMachineService');
 const ComplaintEvent = require('../../models/ComplaintEvent');
 const Notification = require('../../models/Notification');
+const { generateSequentialId } = require('../../utils/idGenerator');
 
 // Optional authentication middleware for endpoints accessible to both public and authenticated users
 const optionalAuth = (req, res, next) => {
@@ -57,7 +58,7 @@ router.get('/', optionalAuth, async (req, res) => {
       }
     }
 
-    if (status) query.status = status;
+    if (status && status !== 'All' && status !== 'undefined' && status !== 'null') query.status = status;
     if (category) query.category = category;
     if (assetId) query.assetId = assetId.toUpperCase();
     if (ward) query['location.ward'] = ward;
@@ -216,8 +217,7 @@ router.post('/', optionalAuth, upload.any(), async (req, res) => {
       photoUrl
     } = req.body;
 
-    const count = await Complaint.countDocuments();
-    const nextId = `CMP-2026-${String(count + 101).padStart(4, '0')}`;
+    const nextId = await generateSequentialId(Complaint, 'complaintId', 'CMP');
 
     let targetAssetId = assetId ? assetId.toUpperCase() : 'DR-001';
     const parsedLat = parseFloat(lat) || 12.9716;
@@ -393,8 +393,7 @@ router.post('/:id/reopen', optionalAuth, upload.any(), async (req, res) => {
     complaint.publicStatusUpdate = `Issue re-opened by citizen: "${reason}". Follow-up inspection scheduled.`;
 
     // Generate follow-up recurrence complaint
-    const totalCount = await Complaint.countDocuments();
-    const followUpId = `CMP-2026-${String(totalCount + 101).padStart(4, '0')}`;
+    const followUpId = await generateSequentialId(Complaint, 'complaintId', 'CMP');
 
     const followUp = new Complaint({
       complaintId: followUpId,

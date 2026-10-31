@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TimelineEvent } from '../../types';
 import { 
   AlertCircle, 
@@ -24,6 +24,10 @@ interface InteractiveTimelineProps {
 export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({ events, onSelectEvent }) => {
   const [filter, setFilter] = useState<string>('ALL');
   const [expandedId, setExpandedId] = useState<string | null>(events[0]?.id || null);
+
+  useEffect(() => {
+    setExpandedId(events[0]?.id || null);
+  }, [events]);
 
   const getEventIcon = (type: string, status?: string) => {
     switch (type) {

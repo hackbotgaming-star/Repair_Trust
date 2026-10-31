@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GraphNode, GraphEdge } from '../../types';
 import { GitBranch, ShieldAlert, Wrench, Video, CheckCircle, AlertTriangle, Layers, ArrowRight } from 'lucide-react';
 
@@ -10,6 +10,10 @@ interface RelationshipGraphProps {
 
 export const RelationshipGraph: React.FC<RelationshipGraphProps> = ({ nodes, edges, onSelectNode }) => {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(nodes[0] || null);
+
+  useEffect(() => {
+    setSelectedNode(nodes[0] || null);
+  }, [nodes]);
 
   const getNodeColor = (type: string, status?: string) => {
     switch (type) {

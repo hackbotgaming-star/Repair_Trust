@@ -12,6 +12,27 @@ export const removeAuthToken = () => {
   localStorage.removeItem('repairtrust_token');
 };
 
+/**
+ * Builds a clean query string omitting undefined, null, empty strings,
+ * and stringified "undefined" / "null" values.
+ */
+export const toQueryString = (params: Record<string, any> = {}): string => {
+  const cleanParams: Record<string, string> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value !== '' &&
+      value !== 'undefined' &&
+      value !== 'null'
+    ) {
+      cleanParams[key] = String(value);
+    }
+  }
+  const qs = new URLSearchParams(cleanParams).toString();
+  return qs ? `?${qs}` : '';
+};
+
 const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
   const token = getAuthToken();
   const headers = new Headers(options.headers || {});
@@ -32,6 +53,10 @@ const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promi
   const data = await response.json();
 
   if (!response.ok) {
+    if (response.status === 401) {
+      // Clear expired or invalid credentials
+      removeAuthToken();
+    }
     throw new Error(data.message || `Request failed with status ${response.status}`);
   }
 
@@ -50,8 +75,7 @@ export const api = {
   // Assets
   assets: {
     list: (params: Record<string, any> = {}) => {
-      const q = new URLSearchParams(params).toString();
-      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/assets?${q}`);
+      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/assets${toQueryString(params)}`);
     },
     get: (assetId: string) => apiRequest<{ success: boolean; data: any }>(`/assets/${assetId}`),
     create: (body: any) => apiRequest<{ success: boolean; data: any }>('/assets', { method: 'POST', body: JSON.stringify(body) }),
@@ -63,8 +87,7 @@ export const api = {
   // Complaints
   complaints: {
     list: (params: Record<string, any> = {}) => {
-      const q = new URLSearchParams(params).toString();
-      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/complaints?${q}`);
+      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/complaints${toQueryString(params)}`);
     },
     get: (complaintId: string) => apiRequest<{ success: boolean; data: any }>(`/complaints/${complaintId}`),
     v1Get: (complaintId: string) => apiRequest<{ success: boolean; data: any }>(`/v1/complaints/${complaintId}`),
@@ -110,12 +133,10 @@ export const api = {
   // Work Orders
   workOrders: {
     list: (params: Record<string, any> = {}) => {
-      const q = new URLSearchParams(params).toString();
-      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/work-orders?${q}`);
+      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/work-orders${toQueryString(params)}`);
     },
     myTasks: (params: Record<string, any> = {}) => {
-      const q = new URLSearchParams({ ...params, myTasks: 'true' }).toString();
-      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/work-orders?${q}`);
+      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/work-orders${toQueryString({ ...params, myTasks: 'true' })}`);
     },
     get: (workOrderId: string) => apiRequest<{ success: boolean; data: any; auditorEvaluation: any }>(`/work-orders/${workOrderId}`),
     create: (body: any) => apiRequest<{ success: boolean; data: any }>('/work-orders', { method: 'POST', body: JSON.stringify(body) }),
@@ -142,8 +163,7 @@ export const api = {
   // LiveWork Proof Videos
   videos: {
     list: (params: Record<string, any> = {}) => {
-      const q = new URLSearchParams(params).toString();
-      return apiRequest<{ success: boolean; data: any[] }>(`/videos?${q}`);
+      return apiRequest<{ success: boolean; data: any[] }>(`/videos${toQueryString(params)}`);
     },
     get: (videoId: string) => apiRequest<{ success: boolean; data: any }>(`/videos/${videoId}`),
     upload: (formData: FormData) => apiRequest<{ success: boolean; data: any; message: string }>('/videos/upload', { method: 'POST', body: formData }),
@@ -153,8 +173,7 @@ export const api = {
   // Inspections
   inspections: {
     list: (params: Record<string, any> = {}) => {
-      const q = new URLSearchParams(params).toString();
-      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/inspections?${q}`);
+      return apiRequest<{ success: boolean; data: any[]; pagination: any }>(`/inspections${toQueryString(params)}`);
     },
     create: (body: any) => apiRequest<{ success: boolean; data: any }>('/inspections', { method: 'POST', body: JSON.stringify(body) })
   },
@@ -162,8 +181,7 @@ export const api = {
   // Investigations
   investigations: {
     list: (params: Record<string, any> = {}) => {
-      const q = new URLSearchParams(params).toString();
-      return apiRequest<{ success: boolean; data: any[] }>(`/investigations?${q}`);
+      return apiRequest<{ success: boolean; data: any[] }>(`/investigations${toQueryString(params)}`);
     },
     get: (assetId: string) => apiRequest<{ success: boolean; data: any }>(`/investigations/${assetId}`),
     resolve: (assetId: string, body: any) => apiRequest<{ success: boolean; data: any }>(`/investigations/${assetId}/resolve`, { method: 'POST', body: JSON.stringify(body) })
@@ -219,8 +237,7 @@ export const api = {
   admin: {
     getOverview: () => apiRequest<{ success: boolean; data: any }>('/v1/admin/overview'),
     getUsers: (params: Record<string, any> = {}) => {
-      const q = new URLSearchParams(params).toString();
-      return apiRequest<{ success: boolean; data: any[] }>(`/v1/admin/users?${q}`);
+      return apiRequest<{ success: boolean; data: any[] }>(`/v1/admin/users${toQueryString(params)}`);
     },
     createUser: (body: any) =>
       apiRequest<{ success: boolean; message: string; data: any }>('/v1/admin/users', {

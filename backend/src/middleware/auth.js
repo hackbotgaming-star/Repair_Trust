@@ -46,13 +46,25 @@ const authorizeRoles = (...allowedRoles) => {
   };
 };
 
-const optionalAuth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    return authenticate(req, res, next);
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const user = await User.findById(decoded.id).select('-password');
+      if (user && user.isActive) {
+        req.user = user;
+        return next();
+      }
+    }
+    req.user = null;
+    return next();
+  } catch (err) {
+    // For optional auth, if the token is expired/invalid, treat as unauthenticated guest instead of blocking with 401
+    req.user = null;
+    return next();
   }
-  req.user = null;
-  next();
 };
 
 module.exports = { authenticate, authorizeRoles, optionalAuth, JWT_SECRET };

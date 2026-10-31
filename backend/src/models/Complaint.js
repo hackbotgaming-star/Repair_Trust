@@ -19,6 +19,7 @@ const complaintSchema = new mongoose.Schema({
     enum: [
       'Overflow / Waterlogging',
       'Debris / Silt Accumulation',
+      'Drainage Blockage / Silt',
       'Foul Odor / Stagnation',
       'Structural Crack / Collapse',
       'Grate Missing / Damaged',

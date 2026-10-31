@@ -68,8 +68,7 @@ router.post('/upload', authenticate, upload.single('video'), async (req, res) =>
       });
     }
 
-    const count = await EvidenceVideo.countDocuments();
-    const nextVideoId = `VID-2026-${String(count + 101).padStart(4, '0')}`;
+    const nextVideoId = await generateSequentialId(EvidenceVideo, 'videoId', 'VID');
 
     // Relative URL path for frontend playback
     const fileUrl = `/uploads/videos/${req.file.filename}`;

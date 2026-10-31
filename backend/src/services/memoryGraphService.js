@@ -317,7 +317,7 @@ const buildAssetMemoryGraph = async (assetId) => {
     timeline,
     graph: {
       nodes,
-      edges
+      edges: edges.filter(e => new Set(nodes.map(n => n.id)).has(e.source) && new Set(nodes.map(n => n.id)).has(e.target))
     },
     metrics: {
       totalTimelineEvents: timeline.length,

@@ -4,6 +4,7 @@ const Inspection = require('../models/Inspection');
 const Asset = require('../models/Asset');
 const AuditLog = require('../models/AuditLog');
 const { authenticate, authorizeRoles } = require('../middleware/auth');
+const { generateSequentialId } = require('../utils/idGenerator');
 
 // List Inspections
 router.get('/', async (req, res) => {
@@ -38,8 +39,7 @@ router.get('/', async (req, res) => {
 // Create Inspection (Field Worker / Engineer / Admin)
 router.post('/', authenticate, authorizeRoles('administrator', 'engineer', 'field_worker'), async (req, res) => {
   try {
-    const count = await Inspection.countDocuments();
-    const nextId = `INS-2026-${String(count + 101).padStart(4, '0')}`;
+    const nextId = await generateSequentialId(Inspection, 'inspectionId', 'INS');
 
     const {
       assetId,
