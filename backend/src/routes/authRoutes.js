@@ -110,7 +110,7 @@ router.post('/demo-login', async (req, res) => {
     const allowedRoles = ['administrator', 'engineer', 'field_worker', 'citizen'];
     const targetRole = allowedRoles.includes(role) ? role : 'engineer';
 
-    let user = await User.findOne({ role: targetRole });
+    let user = targetRole === 'field_worker' ? (await User.findOne({ email: 'worker@repairtrust.gov' })) || (await User.findOne({ role: targetRole })) : await User.findOne({ role: targetRole });
     if (!user) {
       // create default
       user = new User({

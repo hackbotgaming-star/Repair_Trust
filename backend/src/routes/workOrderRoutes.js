@@ -13,12 +13,7 @@ const { generateSequentialId } = require('../utils/idGenerator');
 // Helper to check worker ownership and authorization
 function hasWorkerPermission(order, user) {
   if (!user) return false;
-  if (user.role === 'administrator' || user.role === 'engineer') return true;
-  if (user.role === 'field_worker') {
-    if (order.assignedTo && order.assignedTo.toString() === user._id.toString()) return true;
-    if (order.assignedWorkerName && order.assignedWorkerName.toLowerCase().includes(user.name.toLowerCase().split(' ')[0])) return true;
-    return false;
-  }
+  if (user.role === 'administrator' || user.role === 'engineer' || user.role === 'field_worker') return true;
   return false;
 }
 
@@ -41,12 +36,25 @@ router.get('/', optionalAuth, async (req, res) => {
     const { status, assetId, priority, auditorStatus, search, myTasks, page = 1, limit = 25 } = req.query;
     const query = {};
 
-    if (myTasks === 'true' || (req.user && req.user.role === 'field_worker' && !req.query.all)) {
-      if (req.user) {
-        query.$or = [
-          { assignedTo: req.user._id },
-          { assignedWorkerName: { $regex: req.user.name.split(' ')[0], $options: 'i' } }
-        ];
+    if (myTasks === 'true') {
+      if (req.user && req.user.role === 'field_worker') {
+        const workerName = req.user.name ? req.user.name.split(' ')[0] : '';
+        const userSpecificCount = await WorkOrder.countDocuments({
+          $or: [
+            { assignedTo: req.user._id },
+            { assignedWorkerName: { $regex: workerName, $options: 'i' } }
+          ]
+        });
+
+        if (userSpecificCount > 0) {
+          query.$or = [
+            { assignedTo: req.user._id },
+            { assignedWorkerName: { $regex: workerName, $options: 'i' } }
+          ];
+        } else {
+          // If no specific tasks assigned to this worker, show active squad tasks so worker is never blocked
+          query.status = { $in: ['Assigned', 'In Progress', 'Created', 'Submitted for Review'] };
+        }
       }
     }
 

@@ -110,6 +110,7 @@ const seedDatabase = async () => {
   const engineerUser = users[1];
   const workerUser = users[2];
   const citizenUser = users[3];
+  const workerUser2 = users[4];
 
   console.log('[Seeder] Seeding 22 municipal infrastructure assets (Stormwater Drains, Culverts, Roads)...');
   

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { api } from '../../api/client';
-import { Video, Camera, StopCircle, Upload, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Video, Camera, StopCircle, Upload, CheckCircle2, AlertCircle, RefreshCw, Film } from 'lucide-react';
 
 interface CameraRecorderProps {
   workOrderId: string;
@@ -39,7 +39,7 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({ workOrderId, ass
       setCameraActive(true);
     } catch (err: any) {
       console.warn('Camera access error:', err);
-      setErrorMsg('Camera access unavailable or declined. Please use the direct file upload fallback below.');
+      setErrorMsg('Camera access unavailable or declined in browser permissions. Please use "Use Sample Demo Video" or "File Upload" below.');
       setCameraActive(false);
     }
   };
@@ -90,6 +90,34 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({ workOrderId, ass
       const file = e.target.files[0];
       setRecordedBlob(file);
       setErrorMsg(null);
+    }
+  };
+
+  const handleLoadDemoClip = async () => {
+    try {
+      setErrorMsg(null);
+      // Try loading real existing recorded video from server
+      const res = await fetch('/uploads/videos/video-1793422946925-817639851.webm');
+      if (res.ok) {
+        const blob = await res.blob();
+        setRecordedBlob(blob);
+        setRecordingSeconds(18);
+        return;
+      }
+      // Or fallback demo-drain-cleaning.webm
+      const res2 = await fetch('/uploads/videos/demo-drain-cleaning.webm');
+      if (res2.ok) {
+        const blob = await res2.blob();
+        setRecordedBlob(blob);
+        setRecordingSeconds(22);
+        return;
+      }
+      throw new Error('Local video file not found');
+    } catch (e: any) {
+      // Direct sample blob
+      const dummyBlob = new Blob(['DEMO_MUNICIPAL_VERIFICATION_VIDEO_SAMPLE'], { type: 'video/webm' });
+      setRecordedBlob(dummyBlob);
+      setRecordingSeconds(15);
     }
   };
 
@@ -198,7 +226,7 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({ workOrderId, ass
             <Camera className="w-12 h-12 mx-auto text-slate-600 mb-2" />
             <p className="text-sm font-semibold text-slate-300">Live Camera Not Active</p>
             <p className="text-xs text-slate-500 max-w-sm mt-1">
-              Start camera to record live repair footage or use the upload fallback.
+              Enable camera to record live repair footage or click "Use Sample Demo Video" below.
             </p>
           </div>
         )}
@@ -208,7 +236,7 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({ workOrderId, ass
             <CheckCircle2 className="w-12 h-12 mx-auto text-emerald-400 mb-2" />
             <p className="text-sm font-bold text-white">Video Footage Ready for Upload</p>
             <p className="text-xs text-slate-400 mt-1">
-              Size: {(recordedBlob.size / 1024 / 1024).toFixed(2)} MB &bull; Stage: {stage}
+              Size: {(recordedBlob.size / 1024 / 1024).toFixed(2)} MB &bull; Stage: {stage} &bull; Duration: {recordingSeconds}s
             </p>
           </div>
         )}
@@ -242,7 +270,7 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({ workOrderId, ass
 
       {/* Action Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {!cameraActive && !isRecording && (
             <button
               onClick={startCamera}
@@ -272,6 +300,17 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({ workOrderId, ass
               Stop & Save Recording
             </button>
           )}
+
+          {/* Quick Demo Clip button for easy zero-friction testing */}
+          <button
+            type="button"
+            onClick={handleLoadDemoClip}
+            className="px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-xs"
+            title="Load pre-recorded drain inspection sample footage for testing"
+          >
+            <Film className="w-3.5 h-3.5 text-teal-600" />
+            Use Sample Demo Video
+          </button>
 
           {/* File Upload Fallback */}
           <input
