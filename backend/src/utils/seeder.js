@@ -86,6 +86,24 @@ const seedDatabase = async () => {
       role: 'citizen',
       department: 'Public Resident',
       phone: '+1 (555) 019-7734'
+    },
+    {
+      name: 'Suresh Patil',
+      email: 'worker2@repairtrust.gov',
+      password: 'password123',
+      role: 'field_worker',
+      department: 'Zone 2 Civil & Asphalt Maintenance Team',
+      badgeNumber: 'FW-204',
+      phone: '+1 (555) 019-5561'
+    },
+    {
+      name: 'Priya Sharma',
+      email: 'engineer2@repairtrust.gov',
+      password: 'password123',
+      role: 'engineer',
+      department: 'Roads & Highway Structural Quality Division',
+      badgeNumber: 'ENG-512',
+      phone: '+1 (555) 019-6639'
     }
   ]);
 
@@ -559,6 +577,99 @@ const seedDatabase = async () => {
       linkedWorkOrderId: 'WO-2026-003',
       publicStatusUpdate: 'Consolidated with ongoing work order WO-2026-003.',
       createdAt: new Date('2026-10-12T09:15:00Z')
+    },
+    {
+      complaintId: 'CMP-2026-0101',
+      assetId: 'DR-009',
+      category: 'Pothole / Damaged Road',
+      description: 'Dangerous 14cm deep pothole near Metro Concourse pedestrian crossing. Wheel rim damaged on delivery scooter.',
+      reporterDetails: { userId: citizenUser._id, name: 'Amina Patel', phone: '+1 555-019-7734', email: 'citizen@repairtrust.gov' },
+      location: { street: 'Central Metro Concourse, Pillar 128', ward: 'Ward 4 (Central)', coordinates: { lat: 12.9740, lng: 77.5920 } },
+      severity: 'Critical',
+      status: 'In Progress',
+      linkedWorkOrderId: 'WO-2026-005',
+      photos: ['https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Field team dispatched under WO-2026-005 with hot-mix asphalt patching unit.',
+      createdAt: new Date(Date.now() - 36 * 3600 * 1000)
+    },
+    {
+      complaintId: 'CMP-2026-0102',
+      assetId: 'DR-006',
+      category: 'Broken Streetlights',
+      description: 'High-mast streetlight pole #34 flickering intermittently and junction box wiring is exposed near pedestrian sidewalk.',
+      reporterDetails: { name: 'Manish Verma', phone: '+1 555-019-8833', email: 'm.verma@example.com' },
+      location: { street: 'Hospital Perimeter Blvd', ward: 'Ward 3 (Civic West)', coordinates: { lat: 12.9752, lng: 77.5874 } },
+      severity: 'Medium',
+      status: 'Submitted',
+      photos: ['https://images.unsplash.com/photo-1508873696983-2df5293cb395?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Complaint registered. Triage assignment to electrical maintenance squad pending.',
+      createdAt: new Date(Date.now() - 14 * 3600 * 1000)
+    },
+    {
+      complaintId: 'CMP-2026-0103',
+      assetId: 'DR-003',
+      category: 'Manhole Damaged / Open',
+      description: 'Heavy duty storm grate dislodged and missing in busy market area. Severe hazard for pedestrians and cyclists.',
+      reporterDetails: { name: 'Kavita Sundaram', phone: '+1 555-019-9944', email: 'kavita.s@example.com' },
+      location: { street: 'Ashoka Bazaar Road', ward: 'Ward 2 (Market East)', coordinates: { lat: 12.9682, lng: 77.5891 } },
+      severity: 'Critical',
+      status: 'UNDER_REVIEW',
+      linkedWorkOrderId: 'WO-2026-006',
+      photos: ['https://images.unsplash.com/photo-1574360897459-65ac94b8e235?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Replacement ductile iron grate installed. LiveWork Proof submitted for engineering audit.',
+      createdAt: new Date(Date.now() - 28 * 3600 * 1000)
+    },
+    {
+      complaintId: 'CMP-2026-0104',
+      assetId: 'DR-020',
+      category: 'Structural Crack / Collapse',
+      description: 'Heritage granite retaining masonry slab leaning inward by 15 degrees after recent heavy rainfall.',
+      reporterDetails: { name: 'Nagaraj Bhat', phone: '+1 555-019-2233', email: 'nagaraj.bhat@example.com' },
+      location: { street: 'Bull Temple Road', ward: 'Ward 3 (Civic West)', coordinates: { lat: 12.9430, lng: 77.5680 } },
+      severity: 'High',
+      status: 'INSPECTION_SCHEDULED',
+      photos: ['https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Heritage structural engineering assessment in progress.',
+      createdAt: new Date(Date.now() - 48 * 3600 * 1000)
+    },
+    {
+      complaintId: 'CMP-2026-0105',
+      assetId: 'DR-016',
+      category: 'Foul Odor / Stagnation',
+      description: 'Sewage overflowing into open stormwater canal causing foul odor and unsanitary road conditions.',
+      reporterDetails: { name: 'Farhan Ali', phone: '+1 555-019-5511', email: 'farhan.ali@example.com' },
+      location: { street: 'Valley Primary Channel', ward: 'Ward 6 (Industrial South)', coordinates: { lat: 12.9420, lng: 77.6150 } },
+      severity: 'High',
+      status: 'Resolved',
+      photos: ['https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Emergency diversion bypass installed and canal deodorized.',
+      createdAt: new Date(Date.now() - 72 * 3600 * 1000)
+    },
+    {
+      complaintId: 'CMP-2026-0106',
+      assetId: 'DR-017',
+      category: 'Pothole / Damaged Road',
+      description: 'Asphalt rutting and deep depressions along 100ft road causing severe vehicular slowdowns.',
+      reporterDetails: { name: 'Siddharth Menon', phone: '+1 555-019-4477', email: 's.menon@example.com' },
+      location: { street: '100 Feet Road, 12th Main', ward: 'Ward 2 (Market East)', coordinates: { lat: 12.9780, lng: 77.6380 } },
+      severity: 'Medium',
+      status: 'Closed',
+      photos: ['https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Milled and resurfaced with dense bituminous macadam. Verified and closed.',
+      createdAt: new Date(Date.now() - 96 * 3600 * 1000)
+    },
+    {
+      complaintId: 'CMP-2026-0107',
+      assetId: 'DR-001',
+      category: 'Overflow / Waterlogging',
+      description: 'Citizen reopened dispute: Water is still pooling 4 days after de-silting crew left site.',
+      reporterDetails: { userId: citizenUser._id, name: 'Amina Patel', phone: '+1 555-019-7734', email: 'citizen@repairtrust.gov' },
+      location: { street: '12th Cross, MG Avenue', ward: 'Ward 4 (Central)', coordinates: { lat: 12.9716, lng: 77.5946 } },
+      severity: 'High',
+      status: 'REOPENED',
+      photos: ['https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Reopened by citizen with dispute evidence. Root-cause downstream probe prioritized.',
+      createdAt: new Date(Date.now() - 8 * 3600 * 1000)
     }
   ]);
 
@@ -802,6 +913,195 @@ const seedDatabase = async () => {
         }
       ],
       createdAt: new Date(Date.now() - 24 * 3600 * 1000)
+    },
+    // Work Order 5: Road Pothole Asphalting (In Progress)
+    {
+      workOrderId: 'WO-2026-005',
+      assetId: 'DR-009',
+      linkedComplaintIds: ['CMP-2026-0101'],
+      problemDescription: 'Mill asphalt surrounding 14cm crater and lay hot-mix bitumen patch with compaction.',
+      assignedTo: workerUser._id,
+      assignedWorkerName: 'Ramesh Kumar (Zone 4 Field Team)',
+      assignedTeam: 'Zone 4 Field Maintenance Squad B',
+      priority: 'Urgent',
+      dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+      repairType: 'Structural Crack Patching',
+      status: 'In Progress',
+      closureAuditorStatus: 'Incomplete',
+      closureAuditorFlags: [
+        {
+          code: 'MISSING_AFTER_EVIDENCE',
+          rule: 'Post-repair photographic evidence required',
+          message: 'Final compaction and surface level photo evidence is still pending.',
+          severity: 'error'
+        }
+      ],
+      requiredEvidenceChecklist: {
+        beforePhotoRequired: true,
+        duringPhotoRequired: true,
+        afterPhotoRequired: true,
+        videoProofRequired: false,
+        completionNoteRequired: true
+      },
+      beforeEvidence: [
+        {
+          url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80',
+          caption: 'Severe pothole crater measuring 1.2m x 0.9m x 14cm depth',
+          type: 'photo',
+          timestamp: new Date(Date.now() - 10 * 3600 * 1000)
+        }
+      ],
+      duringEvidence: [
+        {
+          url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+          caption: 'Hot mix asphalt poured and vibratory plate compactor active',
+          type: 'photo',
+          timestamp: new Date(Date.now() - 2 * 3600 * 1000)
+        }
+      ],
+      afterEvidence: [],
+      videoEvidence: [],
+      completionNotes: 'Pothole edge saw-cut and tack-coat emulsion applied. Final rolling in progress.',
+      materialsUsed: [
+        { item: 'Bitumen Emulsion Tack Coat', quantity: '25 Liters' },
+        { item: 'Hot Mix Asphalt (VG-30)', quantity: '2.8 Metric Tons' },
+        { item: 'Plate Compactor Machine', quantity: '1 Unit' }
+      ],
+      auditLog: [
+        {
+          action: 'STARTED_WORK',
+          performedBy: 'Ramesh Kumar',
+          role: 'field_worker',
+          newStatus: 'In Progress',
+          note: 'Started surface cutting and base preparation.',
+          timestamp: new Date(Date.now() - 8 * 3600 * 1000)
+        }
+      ],
+      createdAt: new Date(Date.now() - 24 * 3600 * 1000)
+    },
+    // Work Order 6: Manhole Replacement (Submitted - Ready for Closure Audit Approval!)
+    {
+      workOrderId: 'WO-2026-006',
+      assetId: 'DR-003',
+      linkedComplaintIds: ['CMP-2026-0103'],
+      problemDescription: 'Replace missing pedestrian storm manhole grate with lockable ductile iron grating.',
+      assignedTo: workerUser._id,
+      assignedWorkerName: 'Ramesh Kumar (Zone 4 Field Team)',
+      assignedTeam: 'Zone 4 Field Maintenance Squad B',
+      priority: 'Urgent',
+      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      repairType: 'Cover Slab / Grate Replacement',
+      status: 'Submitted for Review',
+      closureAuditorStatus: 'Under Review',
+      closureAuditorFlags: [],
+      requiredEvidenceChecklist: {
+        beforePhotoRequired: true,
+        duringPhotoRequired: true,
+        afterPhotoRequired: true,
+        videoProofRequired: false,
+        completionNoteRequired: true
+      },
+      beforeEvidence: [
+        {
+          url: 'https://images.unsplash.com/photo-1574360897459-65ac94b8e235?auto=format&fit=crop&w=600&q=80',
+          caption: 'Open hazardous void on pedestrian sidewalk',
+          type: 'photo',
+          timestamp: new Date(Date.now() - 16 * 3600 * 1000)
+        }
+      ],
+      duringEvidence: [
+        {
+          url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+          caption: 'New steel frame mortared with rapid-setting polymer concrete',
+          type: 'photo',
+          timestamp: new Date(Date.now() - 8 * 3600 * 1000)
+        }
+      ],
+      afterEvidence: [
+        {
+          url: 'https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?auto=format&fit=crop&w=600&q=80',
+          caption: 'Ductile iron lockable grate securely seated and flush with curb',
+          type: 'photo',
+          timestamp: new Date(Date.now() - 2 * 3600 * 1000)
+        }
+      ],
+      videoEvidence: [],
+      completionNotes: 'Frame securely embedded. Tested with 500kg dynamic load. Zero wobble, fully flush with sidewalk curb.',
+      materialsUsed: [
+        { item: 'D400 Heavy Duty Ductile Iron Grate 600x600mm', quantity: '1 Unit' },
+        { item: 'Rapid-Set Non-Shrink Structural Grout', quantity: '4 Bags' }
+      ],
+      submittedAt: new Date(Date.now() - 2 * 3600 * 1000),
+      engineerDecision: 'Pending Review',
+      auditLog: [
+        {
+          action: 'SUBMITTED_FOR_REVIEW',
+          performedBy: 'Ramesh Kumar',
+          role: 'field_worker',
+          newStatus: 'Submitted',
+          note: 'Work completed. Full Before/During/After photo proof submitted for engineer audit.',
+          timestamp: new Date(Date.now() - 2 * 3600 * 1000)
+        }
+      ],
+      createdAt: new Date(Date.now() - 20 * 3600 * 1000)
+    },
+    // Work Order 7: High-Mast Light Rewiring (Paused with explicit reason)
+    {
+      workOrderId: 'WO-2026-007',
+      assetId: 'DR-006',
+      linkedComplaintIds: ['CMP-2026-0102'],
+      problemDescription: 'Isolate short-circuited underground armored cable and install waterproof terminal block.',
+      assignedTo: workerUser._id,
+      assignedWorkerName: 'Ramesh Kumar (Zone 4 Field Team)',
+      assignedTeam: 'Zone 4 Field Maintenance Squad B',
+      priority: 'Medium',
+      dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      repairType: 'Preventative Inspection',
+      status: 'Paused',
+      pauseReason: 'Awaiting hydraulic aerial bucket lift truck and BESCOM power grid shutoff permit.',
+      closureAuditorStatus: 'Incomplete',
+      closureAuditorFlags: [
+        {
+          code: 'TASK_PAUSED',
+          rule: 'Task suspended due to operational dependency',
+          message: 'Task is on hold awaiting specialized aerial lift equipment.',
+          severity: 'warning'
+        }
+      ],
+      requiredEvidenceChecklist: {
+        beforePhotoRequired: true,
+        duringPhotoRequired: true,
+        afterPhotoRequired: true,
+        videoProofRequired: false,
+        completionNoteRequired: true
+      },
+      beforeEvidence: [
+        {
+          url: 'https://images.unsplash.com/photo-1508873696983-2df5293cb395?auto=format&fit=crop&w=600&q=80',
+          caption: 'Baseline inspection of damaged junction armature',
+          type: 'photo',
+          timestamp: new Date(Date.now() - 12 * 3600 * 1000)
+        }
+      ],
+      duringEvidence: [],
+      afterEvidence: [],
+      videoEvidence: [],
+      completionNotes: 'Site barricaded with caution tape. Work paused until 14m cherry picker arrives.',
+      materialsUsed: [
+        { item: 'Safety Warning Barricades', quantity: '4 Units' },
+        { item: 'Reflective Hazard Tape', quantity: '25 Meters' }
+      ],
+      auditLog: [
+        {
+          action: 'PAUSED_WORK',
+          performedBy: 'Ramesh Kumar',
+          role: 'field_worker',
+          newStatus: 'Paused',
+          note: 'Paused due to requirement of aerial crane truck and power line shutdown clearance.',
+          timestamp: new Date(Date.now() - 6 * 3600 * 1000)
+        }
+      ],
+      createdAt: new Date(Date.now() - 14 * 3600 * 1000)
     }
   ]);
 
