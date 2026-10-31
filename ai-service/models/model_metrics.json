@@ -1,0 +1,45 @@
+{
+  "model_version": "v1.2.0-synthetic-demo",
+  "model_type": "Random Forest Classifier & Isolation Forest",
+  "dataset_label": "Synthetic Labeled Municipal Stormwater Drain Dataset",
+  "total_samples": 750,
+  "train_samples": 600,
+  "test_samples": 150,
+  "target_variable": "repeat_failure_within_window (60-day observation window)",
+  "features": [
+    "previous_complaint_count",
+    "number_of_repairs",
+    "days_since_last_repair",
+    "avg_days_between_failures",
+    "rainfall_intensity_mm",
+    "downstream_blockage_reported",
+    "asset_age_years",
+    "debris_severity_index",
+    "historical_capacity_ratio"
+  ],
+  "metrics": {
+    "accuracy": 0.7267,
+    "precision": 0.7011,
+    "recall": 0.8026,
+    "f1_score": 0.7485,
+    "roc_auc": 0.8046,
+    "confusion_matrix": {
+      "true_negative": 48,
+      "false_positive": 26,
+      "false_negative": 15,
+      "true_positive": 61
+    }
+  },
+  "feature_importances": {
+    "rainfall_intensity_mm": 0.21956951636066283,
+    "avg_days_between_failures": 0.16086415741381505,
+    "days_since_last_repair": 0.14749103047597859,
+    "debris_severity_index": 0.10873538547250097,
+    "historical_capacity_ratio": 0.09810740595433204,
+    "previous_complaint_count": 0.08871345046651007,
+    "asset_age_years": 0.07066460557051611,
+    "downstream_blockage_reported": 0.058671313847674295,
+    "number_of_repairs": 0.047183134438010116
+  },
+  "disclaimer": "This model is trained on documented synthetic municipal records for decision support and demonstration. All risk scores reflect historical correlation and should be combined with physical engineering inspection."
+}

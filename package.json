@@ -1,0 +1,25 @@
+{
+  "name": "repairtrust",
+  "version": "1.0.0",
+  "description": "RepairTrust — Trust Repairs. Find Real Fixes. AI-assisted municipal infrastructure repair verification and decision-support platform.",
+  "scripts": {
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run dev",
+    "start:ai": "cd ai-service && python -m uvicorn main:app --host 127.0.0.1 --port 8000",
+    "build:frontend": "cd frontend && npm run build",
+    "test:backend": "cd backend && npm test",
+    "test:e2e": "cd backend && npm run test:e2e",
+    "test:all": "cd backend && npm test && npm run test:e2e && npm run test:acceptance",
+    "seed": "cd backend && npm run seed"
+  },
+  "keywords": [
+    "infrastructure",
+    "civic-tech",
+    "repairtrust",
+    "mern",
+    "closure-auditor",
+    "livework-proof"
+  ],
+  "author": "RepairTrust Team",
+  "license": "ISC"
+}

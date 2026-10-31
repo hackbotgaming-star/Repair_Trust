@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment Variables & Secrets
+.env
+*.env
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+backend/.env
+frontend/.env
+!*.env.example
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+*.local
+
+# Python / AI Service
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Uploaded dynamic media (keep directory structure)
+backend/uploads/photos/*
+backend/uploads/videos/*
+!backend/uploads/photos/.gitkeep
+!backend/uploads/videos/.gitkeep
+
+# IDEs & OS Files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.log
