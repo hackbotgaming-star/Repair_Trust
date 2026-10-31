@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
+  Sparkles,
   CheckCircle2,
   Clock,
   AlertTriangle,
@@ -56,6 +57,19 @@ export const PublicComplaintTrackPage: React.FC = () => {
 
   // Success notifications
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [allComplaints, setAllComplaints] = useState<any[]>([]);
+  const [showCatalog, setShowCatalog] = useState(true);
+
+  const loadAllComplaints = async () => {
+    try {
+      const res = await api.complaints.list({ limit: 30 });
+      if (res && res.data) {
+        setAllComplaints(res.data);
+      }
+    } catch (e) {
+      console.warn('Could not load public complaints list:', e);
+    }
+  };
 
   const fetchComplaintData = async (targetId: string) => {
     if (!targetId.trim()) return;
@@ -86,9 +100,14 @@ export const PublicComplaintTrackPage: React.FC = () => {
   };
 
   useEffect(() => {
+    loadAllComplaints();
     if (id) {
       setSearchId(id);
       fetchComplaintData(id);
+    } else {
+      // Auto-load premier demo showcase CMP-2026-0089 so the page is never blank!
+      setSearchId('CMP-2026-0089');
+      fetchComplaintData('CMP-2026-0089');
     }
   }, [id]);
 
@@ -195,11 +214,42 @@ export const PublicComplaintTrackPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-sm transition flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-sm transition flex items-center gap-1.5 shrink-0"
             >
               {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Track'}
             </button>
           </form>
+
+          {/* Quick 1-Click Demo Showcase Pills */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-slate-400 font-semibold text-xs uppercase tracking-wider flex items-center gap-1.5 mr-1">
+              <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+              Demo Showcase:
+            </span>
+            {[
+              { id: 'CMP-2026-0089', label: 'Drain Overflow', stage: 'Active Task', color: 'bg-teal-500/20 text-teal-300 border-teal-500/40 hover:bg-teal-500/30' },
+              { id: 'CMP-2026-0101', label: 'Road Pothole', stage: 'In Progress', color: 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30' },
+              { id: 'CMP-2026-0103', label: 'Open Manhole', stage: 'Submitted', color: 'bg-sky-500/20 text-sky-300 border-sky-500/40 hover:bg-sky-500/30' },
+              { id: 'CMP-2026-0107', label: 'Citizen Dispute', stage: 'Reopened', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30' },
+              { id: 'CMP-2026-0045', label: 'Culvert Clear', stage: 'Verified', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30' }
+            ].map((demo) => (
+              <button
+                key={demo.id}
+                type="button"
+                onClick={() => {
+                  setSearchId(demo.id);
+                  navigate(`/track/${demo.id}`);
+                  fetchComplaintData(demo.id);
+                }}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-mono transition flex items-center gap-1.5 ${demo.color} ${
+                  searchId === demo.id ? 'ring-2 ring-teal-400 font-bold shadow-sm shadow-teal-500/30' : ''
+                }`}
+              >
+                <span className="font-bold">{demo.id}</span>
+                <span className="text-[11px] opacity-80">· {demo.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -609,6 +659,89 @@ export const PublicComplaintTrackPage: React.FC = () => {
           </div>
         )}
       </div>
+
+
+        {/* Public Complaints Explorer Catalog */}
+        <div className="mt-10 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div>
+              <div className="flex items-center gap-2">
+                <Building className="w-5 h-5 text-teal-600" />
+                <h3 className="text-base font-bold text-slate-900">
+                  Public Infrastructure Complaints Directory
+                </h3>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 font-bold border border-teal-200">
+                  {allComplaints.length} Public Cases
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Click any complaint below to track its complete cryptographic SHA-256 event chain, field photos, and repair audit status.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowCatalog(!showCatalog)}
+              className="text-xs font-bold text-teal-600 hover:text-teal-700 hover:underline"
+            >
+              {showCatalog ? 'Hide Directory ▲' : 'Show All Complaints ▼'}
+            </button>
+          </div>
+
+          {showCatalog && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+              {allComplaints.map((item) => (
+                <div
+                  key={item.complaintId}
+                  onClick={() => {
+                    setSearchId(item.complaintId);
+                    navigate(`/track/${item.complaintId}`);
+                    fetchComplaintData(item.complaintId);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`p-4 rounded-xl border transition cursor-pointer hover:shadow-md hover:border-teal-400 ${
+                    complaint?.complaintId === item.complaintId
+                      ? 'border-teal-500 bg-teal-50/50 ring-2 ring-teal-500/20'
+                      : 'border-slate-200 bg-slate-50/50 hover:bg-white'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="font-mono text-xs font-extrabold text-teal-700">
+                      {item.complaintId}
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                        item.status === 'VERIFIED_RESOLVED' || item.status === 'Resolved' || item.status === 'Closed'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : item.status === 'DISPUTED' || item.status === 'REOPENED'
+                          ? 'bg-amber-50 text-amber-700 border-amber-200'
+                          : item.status === 'In Progress' || item.status === 'WORK_IN_PROGRESS'
+                          ? 'bg-sky-50 text-sky-700 border-sky-200'
+                          : 'bg-teal-50 text-teal-700 border-teal-200'
+                      }`}
+                    >
+                      {(item.status || 'SUBMITTED').replace(/_/g, ' ')}
+                    </span>
+                  </div>
+
+                  <h4 className="text-xs font-bold text-slate-800 line-clamp-1">
+                    {item.category}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 line-clamp-2 mt-1">
+                    {item.description}
+                  </p>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-400 mt-3 pt-2 border-t border-slate-200/60">
+                    <span className="truncate max-w-[140px]">
+                      {item.location?.street || item.location?.ward || 'Ward 4'}
+                    </span>
+                    <span className="text-teal-600 font-bold flex items-center gap-1 hover:underline">
+                      Track Now ➔
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
       {/* DISPUTE CLOSURE MODAL */}
       <AnimatePresence>
