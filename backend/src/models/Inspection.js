@@ -29,7 +29,15 @@ const inspectionSchema = new mongoose.Schema({
       'Post-Repair Verification',
       'Downstream CCTV / Camera Probe',
       'Hydraulic Capacity Audit',
-      'Emergency Monsoon Assessment'
+      'Cross-Section & Hydraulic Flow Survey',
+      'Physical Site & Silt Measurement',
+      'Emergency Monsoon Assessment',
+      'Drain De-silting & Cleaning',
+      'Downstream Obstruction Removal',
+      'Structural Crack Patching',
+      'Culvert Flume Clearing',
+      'Cover Slab / Grate Replacement',
+      'Preventative Inspection'
     ],
     default: 'Routine Maintenance Check'
   },
