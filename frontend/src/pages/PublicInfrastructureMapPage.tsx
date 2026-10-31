@@ -49,10 +49,34 @@ export const PublicInfrastructureMapPage: React.FC = () => {
     fetchMapData();
   }, []);
 
+  // Smart Category Matcher
+  const matchesCategory = (category: string, filter: string) => {
+    if (filter === 'ALL') return true;
+    if (filter === 'ROADS') return category === 'Pothole / Damaged Road';
+    if (filter === 'DRAINS') return category === 'Overflow / Waterlogging' || category === 'Debris / Silt Accumulation' || category === 'Damaged Culvert / Grate';
+    if (filter === 'FOOTPATHS') return category === 'Broken Footpath';
+    if (filter === 'MANHOLES') return category === 'Manhole Damaged / Open' || category === 'Grate Missing / Damaged';
+    if (filter === 'LIGHTS') return category === 'Broken Streetlights';
+    if (filter === 'GARBAGE') return category === 'Garbage Blockage';
+    if (filter === 'WATER') return category === 'Water Pipeline Leak';
+    if (filter === 'STRUCTURAL') return category === 'Structural Crack / Collapse';
+    return category === filter;
+  };
+
+  const matchesStatus = (status: string, filter: string) => {
+    if (filter === 'ALL') return true;
+    const s = (status || '').toUpperCase();
+    if (filter === 'SUBMITTED') return s === 'SUBMITTED';
+    if (filter === 'IN_PROGRESS') return s === 'IN PROGRESS' || s === 'WORK_IN_PROGRESS' || s === 'ASSIGNED';
+    if (filter === 'RESOLVED') return s === 'RESOLVED' || s === 'VERIFIED_RESOLVED' || s === 'CLOSED' || s === 'CLOSED_AFTER_REVIEW';
+    if (filter === 'DISPUTED') return s === 'DISPUTED' || s === 'REOPENED' || s === 'UNDER_REVIEW';
+    return s === filter.toUpperCase();
+  };
+
   // Filtered Complaints
   const filteredComplaints = complaints.filter((c) => {
-    if (categoryFilter !== 'ALL' && c.category !== categoryFilter) return false;
-    if (statusFilter !== 'ALL' && c.status !== statusFilter) return false;
+    if (!matchesCategory(c.category, categoryFilter)) return false;
+    if (!matchesStatus(c.status, statusFilter)) return false;
     if (repeatOnly) {
       const isRepeat =
         c.status === 'REOPENED' ||
@@ -232,24 +256,28 @@ export const PublicInfrastructureMapPage: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none"
+            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-teal-500"
           >
-            <option value="ALL">All Categories</option>
-            <option value="Pothole / Damaged Road">Potholes & Roads</option>
-            <option value="Stormwater Drain Blockage / Overflow">Stormwater Drains</option>
-            <option value="Broken Footpath / Pedestrian Hazard">Footpaths</option>
-            <option value="Damaged Manhole / Missing Cover">Manholes</option>
+            <option value="ALL">All Categories ({complaints.length})</option>
+            <option value="ROADS">Potholes & Roads</option>
+            <option value="DRAINS">Stormwater Drains</option>
+            <option value="FOOTPATHS">Footpaths</option>
+            <option value="MANHOLES">Manholes</option>
+            <option value="LIGHTS">Streetlights</option>
+            <option value="GARBAGE">Garbage Blockages</option>
+            <option value="WATER">Water Pipeline Leaks</option>
+            <option value="STRUCTURAL">Structural Collapse</option>
           </select>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none"
+            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-teal-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="SUBMITTED">Submitted</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="RESOLVED">Resolved</option>
             <option value="DISPUTED">Disputed / Recurrent</option>
           </select>
 

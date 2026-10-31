@@ -670,6 +670,130 @@ const seedDatabase = async () => {
       photos: ['https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80'],
       publicStatusUpdate: 'Reopened by citizen with dispute evidence. Root-cause downstream probe prioritized.',
       createdAt: new Date(Date.now() - 8 * 3600 * 1000)
+    },
+    // Category: Broken Footpath
+    {
+      complaintId: 'CMP-2026-0115',
+      assetId: 'DR-009',
+      category: 'Broken Footpath',
+      description: 'Dislodged granite walkway paving slabs and exposed storm drain trench along busy pedestrian shopping zone.',
+      reporterDetails: { name: 'Kavita Chawla', phone: '+1 555-019-3311', email: 'k.chawla@example.com' },
+      location: { street: 'Commercial Street, Tasker Town', ward: 'Ward 4 (Central)', coordinates: { lat: 12.9820, lng: 77.6050 } },
+      severity: 'Medium',
+      status: 'Submitted',
+      photos: ['https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Assigned to Ward 4 civil masonry squad for resetting paver tiles.',
+      createdAt: new Date(Date.now() - 16 * 3600 * 1000)
+    },
+    {
+      complaintId: 'CMP-2026-0116',
+      assetId: 'DR-020',
+      category: 'Broken Footpath',
+      description: 'Cracked concrete sidewalk slab over underground utility trench with 10cm vertical gap, causing pedestrian falls.',
+      reporterDetails: { name: 'Naveen Swamy', phone: '+1 555-019-4422', email: 'n.swamy@example.com' },
+      location: { street: '8th Main Road, Jayanagar 4th Block', ward: 'Ward 3 (Civic West)', coordinates: { lat: 12.9308, lng: 77.5838 } },
+      severity: 'High',
+      status: 'In Progress',
+      photos: ['https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Sidewalk demolished for reconstruction with reinforced sub-base.',
+      createdAt: new Date(Date.now() - 28 * 3600 * 1000)
+    },
+    // Category: Manhole Damaged / Open
+    {
+      complaintId: 'CMP-2026-0117',
+      assetId: 'DR-016',
+      category: 'Manhole Damaged / Open',
+      description: 'Broken and sunken circular storm manhole ring under heavy bus traffic impact. Extreme vehicular danger.',
+      reporterDetails: { name: 'Rajesh Gopinath', phone: '+1 555-019-7788', email: 'r.gopinath@example.com' },
+      location: { street: 'Koramangala 80ft Road, Sony World Junction', ward: 'Ward 6 (Industrial South)', coordinates: { lat: 12.9352, lng: 77.6245 } },
+      severity: 'Critical',
+      status: 'In Progress',
+      photos: ['https://images.unsplash.com/photo-1574360897459-65ac94b8e235?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Site cordoned with retroreflective drums. Heavy duty D400 frame installation ongoing.',
+      createdAt: new Date(Date.now() - 20 * 3600 * 1000)
+    },
+    {
+      complaintId: 'CMP-2026-0118',
+      assetId: 'DR-008',
+      category: 'Manhole Damaged / Open',
+      description: 'Open stormwater inspection chamber without lid along pedestrian school crossing lane.',
+      reporterDetails: { name: 'Geetha Raman', phone: '+1 555-019-8899', email: 'geetha.r@example.com' },
+      location: { street: '15th Cross, Malleshwaram West', ward: 'Ward 1 (Lakeside North)', coordinates: { lat: 13.0031, lng: 77.5702 } },
+      severity: 'Critical',
+      status: 'Submitted',
+      photos: ['https://images.unsplash.com/photo-1574360897459-65ac94b8e235?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Emergency crew notified for temporary barricade and fast-track lid replacement.',
+      createdAt: new Date(Date.now() - 6 * 3600 * 1000)
+    },
+    // Category: Pothole / Damaged Road
+    {
+      complaintId: 'CMP-2026-0119',
+      assetId: 'DR-016',
+      category: 'Pothole / Damaged Road',
+      description: 'Cluster of 3 large craters on inner ring feeder road following storm erosion. Two-wheelers losing balance.',
+      reporterDetails: { name: 'Anand Kulkarni', phone: '+1 555-019-3355', email: 'anand.k@example.com' },
+      location: { street: 'Intermediate Ring Road, Koramangala Link', ward: 'Ward 6 (Industrial South)', coordinates: { lat: 12.9490, lng: 77.6320 } },
+      severity: 'High',
+      status: 'Submitted',
+      photos: ['https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Road maintenance schedule queued for cold-mix bitumen patching.',
+      createdAt: new Date(Date.now() - 10 * 3600 * 1000)
+    },
+    // Category: Overflow / Waterlogging
+    {
+      complaintId: 'CMP-2026-0120',
+      assetId: 'DR-018',
+      category: 'Overflow / Waterlogging',
+      description: 'Lake inlet flume blocked with silt and aquatic weeds; storm runoff backing up onto perimeter carriageway.',
+      reporterDetails: { name: 'Tara Deshmukh', phone: '+1 555-019-6611', email: 'tara.d@example.com' },
+      location: { street: 'Ulsoor Lake Inlet Flume, Sluice Weir Road', ward: 'Ward 2 (Market East)', coordinates: { lat: 12.9830, lng: 77.6200 } },
+      severity: 'Critical',
+      status: 'Assigned',
+      photos: ['https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Excavator and gully sucker deployed to clear weed choke at inlet weir.',
+      createdAt: new Date(Date.now() - 30 * 3600 * 1000)
+    },
+    // Category: Garbage Blockage
+    {
+      complaintId: 'CMP-2026-0121',
+      assetId: 'DR-005',
+      category: 'Garbage Blockage',
+      description: 'Heavy solid waste, plastic bags, and discarded industrial packaging completely choking storm trash grates.',
+      reporterDetails: { name: 'Syed Imran', phone: '+1 555-019-9922', email: 'syed.i@example.com' },
+      location: { street: 'Phase 2 Link Road, Industrial Estate', ward: 'Ward 6 (Industrial South)', coordinates: { lat: 12.9591, lng: 77.6015 } },
+      severity: 'High',
+      status: 'In Progress',
+      photos: ['https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Solid waste management division clearing screen grates with grab crane.',
+      createdAt: new Date(Date.now() - 22 * 3600 * 1000)
+    },
+    // Category: Broken Streetlights
+    {
+      complaintId: 'CMP-2026-0122',
+      assetId: 'DR-008',
+      category: 'Broken Streetlights',
+      description: 'Entire row of 5 high-efficiency LED streetlight luminaires failed; zero visibility along walking track.',
+      reporterDetails: { name: 'Pooja Hegde', phone: '+1 555-019-4455', email: 'p.hegde@example.com' },
+      location: { street: 'Sankey Perimeter Road, Lake Gate 2', ward: 'Ward 1 (Lakeside North)', coordinates: { lat: 12.9845, lng: 77.5789 } },
+      severity: 'Medium',
+      status: 'Resolved',
+      photos: ['https://images.unsplash.com/photo-1508873696983-2df5293cb395?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Control timer unit replaced and phase wiring re-terminated. Verified functioning.',
+      createdAt: new Date(Date.now() - 50 * 3600 * 1000)
+    },
+    // Category: Water Pipeline Leak
+    {
+      complaintId: 'CMP-2026-0123',
+      assetId: 'DR-019',
+      category: 'Water Pipeline Leak',
+      description: 'High-pressure clean potable water main rupture flooding road and eroding gravel sub-grade.',
+      reporterDetails: { name: 'Harish Varma', phone: '+1 555-019-6677', email: 'h.varma@example.com' },
+      location: { street: 'Dr. Rajkumar Road, 1st Block', ward: 'Ward 1 (Lakeside North)', coordinates: { lat: 12.9910, lng: 77.5580 } },
+      severity: 'High',
+      status: 'In Progress',
+      photos: ['https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'],
+      publicStatusUpdate: 'Water board isolation valve shut. Pipeline collar clamp being welded.',
+      createdAt: new Date(Date.now() - 14 * 3600 * 1000)
     }
   ]);
 
