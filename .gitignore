@@ -9,13 +9,11 @@ pnpm-debug.log*
 # Environment Variables & Secrets
 .env
 *.env
-*.env.local
-*.env.development.local
-*.env.test.local
-*.env.production.local
+*.env.*
+*.env.example
+.env.example
 backend/.env
 frontend/.env
-!*.env.example
 
 # Build outputs
 dist/
