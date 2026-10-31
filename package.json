@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "RepairTrust — Trust Repairs. Find Real Fixes. AI-assisted municipal infrastructure repair verification and decision-support platform.",
   "scripts": {
+    "start": "node backend/src/server.js",
+    "build": "npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build",
+    "render-build": "npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build",
     "start:backend": "cd backend && npm start",
     "start:frontend": "cd frontend && npm run dev",
     "start:ai": "cd ai-service && python -m uvicorn main:app --host 127.0.0.1 --port 8000",

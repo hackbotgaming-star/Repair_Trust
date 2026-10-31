@@ -121,6 +121,23 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
+// Serve Frontend Static Build in Production / Single-Service Deployment
+const frontendDistPath = path.join(__dirname, '../../frontend/dist');
+const fs = require('fs');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    const indexPath = path.join(frontendDistPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+    next();
+  });
+}
+
 // Centralized error handling
 app.use((err, req, res, next) => {
   console.error('[Error Handler]', err);
