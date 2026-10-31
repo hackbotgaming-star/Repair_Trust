@@ -11,30 +11,42 @@ import {
   Clock,
   RefreshCw,
   Info,
-  ArrowRight
+  ArrowRight,
+  Filter,
+  Film
 } from 'lucide-react';
 
 export const WorkerLiveWorkProofPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tasks, setTasks] = useState<any[]>([]);
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
   const [videos, setVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewScope, setViewScope] = useState<'ACTIVE_TASK' | 'ALL_VIDEOS'>('ACTIVE_TASK');
 
   const initialTaskId = searchParams.get('task') || 'WO-2026-003';
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [tasksRes, videosRes] = await Promise.all([
-        api.workOrders.myTasks(),
-        api.videos.list()
-      ]);
-      const myTasks = tasksRes.data || [];
-      setTasks(myTasks);
 
-      const found = myTasks.find((t: any) => t.workOrderId === initialTaskId) || myTasks[0];
-      setSelectedTask(found || null);
+      // 1. Try myTasks first
+      const tasksRes = await api.workOrders.myTasks();
+      let taskList = tasksRes.data || [];
+
+      // 2. Fall back to all active work orders so any role (engineer, admin, worker) can operate the station
+      if (taskList.length === 0) {
+        const allRes = await api.workOrders.list({ limit: 50 });
+        taskList = allRes.data || [];
+      }
+      setTasks(taskList);
+
+      const targetId = searchParams.get('task') || initialTaskId;
+      const found = taskList.find((t: any) => t.workOrderId === targetId) || taskList[0] || null;
+      setSelectedTask(found);
+
+      // 3. Load all videos
+      const videosRes = await api.videos.list();
       setVideos(videosRes.data || []);
     } catch (err) {
       console.error('Error loading tasks or videos:', err);
@@ -49,18 +61,30 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
 
   const handleTaskChange = (taskId: string) => {
     const t = tasks.find((item) => item.workOrderId === taskId);
-    if (t) setSelectedTask(t);
+    if (t) {
+      setSelectedTask(t);
+      setSearchParams({ task: taskId });
+    }
   };
 
   const relevantVideos = videos.filter(
     (v) => selectedTask && v.workOrderId === selectedTask.workOrderId
   );
 
+  const displayedVideos = viewScope === 'ALL_VIDEOS' ? videos : relevantVideos;
+
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+              CORE MODULE 3
+            </span>
+            <span className="text-xs text-slate-400">&bull;</span>
+            <span className="text-xs text-slate-500">LiveWork Proof Video Verification</span>
+          </div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <Video className="w-6 h-6 text-rose-600" />
             LiveWork Proof Video Station
@@ -77,13 +101,16 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
             <select
               value={selectedTask?.workOrderId || ''}
               onChange={(e) => handleTaskChange(e.target.value)}
-              className="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white font-mono font-bold outline-none focus:ring-2 focus:ring-teal-500"
+              className="px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 font-mono font-bold text-slate-900 outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer shadow-xs"
             >
-              {tasks.map((t) => (
-                <option key={t.workOrderId} value={t.workOrderId}>
-                  {t.workOrderId} — {t.assetId} ({t.status})
-                </option>
-              ))}
+              {tasks.map((t) => {
+                const vidCount = videos.filter((v) => v.workOrderId === t.workOrderId).length;
+                return (
+                  <option key={t.workOrderId} value={t.workOrderId}>
+                    {t.workOrderId} &bull; {t.assetId} — {t.repairType || t.status} {vidCount > 0 ? `(${vidCount} video${vidCount > 1 ? 's' : ''})` : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
         )}
@@ -103,7 +130,7 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
       </div>
 
       {/* Recorder Component */}
-      {selectedTask && (
+      {selectedTask ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
             <div>
@@ -111,12 +138,13 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
               <h3 className="text-sm font-bold text-slate-900">
                 {selectedTask.workOrderId}: {selectedTask.repairType} on Asset {selectedTask.assetId}
               </h3>
+              <p className="text-xs text-slate-500 mt-0.5">{selectedTask.problemDescription}</p>
             </div>
             <Link
-              to={`/worker/tasks/${selectedTask.workOrderId}`}
-              className="text-xs text-teal-600 hover:text-teal-700 font-bold flex items-center gap-1"
+              to={`/work-orders/${selectedTask.workOrderId}`}
+              className="text-xs text-teal-600 hover:text-teal-700 font-bold flex items-center gap-1 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-xl border border-teal-200 transition"
             >
-              Task Details <ArrowRight className="w-3.5 h-3.5" />
+              Inspect Work Order <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
@@ -126,35 +154,79 @@ export const WorkerLiveWorkProofPage: React.FC = () => {
             onUploadSuccess={() => loadData()}
           />
         </div>
-      )}
+      ) : loading ? (
+        <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 animate-pulse text-slate-400">
+          Loading assigned work order details...
+        </div>
+      ) : null}
 
-      {/* Submitted Proof Footage for Active Task */}
+      {/* Submitted Proof Footage Section */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-            <Video className="w-4 h-4 text-rose-600" />
-            Submitted Proof Footage for {selectedTask?.workOrderId || 'Current Task'} ({relevantVideos.length})
-          </h3>
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <Film className="w-4 h-4 text-rose-600" />
+              {viewScope === 'ACTIVE_TASK'
+                ? `Submitted Proof Footage for ${selectedTask?.workOrderId || 'Current Task'} (${relevantVideos.length})`
+                : `All Municipal Proof Footage (${videos.length})`}
+            </h3>
+
+            {/* Scope Filter Buttons */}
+            <div className="flex bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setViewScope('ACTIVE_TASK')}
+                className={`px-2.5 py-1 rounded-md transition ${
+                  viewScope === 'ACTIVE_TASK'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Current Task ({relevantVideos.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewScope('ALL_VIDEOS')}
+                className={`px-2.5 py-1 rounded-md transition ${
+                  viewScope === 'ALL_VIDEOS'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                All Videos ({videos.length})
+              </button>
+            </div>
+          </div>
+
           <button
             onClick={loadData}
             disabled={loading}
-            className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 font-semibold"
+            className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 font-semibold px-2.5 py-1 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
           >
             <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
         </div>
 
-        {relevantVideos.length === 0 ? (
+        {displayedVideos.length === 0 ? (
           <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-2">
             <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />
-            <p className="text-xs font-bold text-slate-700">No Video Proof Submitted Yet</p>
-            <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
-              This task currently flags a Closure Auditor missing video proof warning. Record a live video or upload a file above.
+            <p className="text-xs font-bold text-slate-700">No Video Proof Submitted Yet for this Task</p>
+            <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+              This task currently flags a Closure Auditor missing video proof warning. Record a live video walkthrough above or upload a footage file.
             </p>
+            {videos.length > 0 && viewScope === 'ACTIVE_TASK' && (
+              <button
+                type="button"
+                onClick={() => setViewScope('ALL_VIDEOS')}
+                className="mt-2 text-xs font-bold text-teal-600 hover:underline inline-flex items-center gap-1"
+              >
+                View {videos.length} other verified videos in the registry &rarr;
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {relevantVideos.map((vid) => (
+            {displayedVideos.map((vid) => (
               <VideoPlayer key={vid.videoId} video={vid} />
             ))}
           </div>
